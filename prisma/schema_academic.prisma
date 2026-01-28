@@ -1,0 +1,69 @@
+// schema-academic.prisma - Base de datos ACADÉMICA (sin usuarios)
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/client-academic"
+}
+
+datasource db_academic {
+  provider = "postgresql"
+}
+
+model Cycle {
+  id        Int      @id @default(autoincrement())
+  name      String
+  year      Int
+  period    Int
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+  isActive  Boolean  @default(false) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  subjects Subject[]
+
+  @@unique([year, period])
+  @@map("cycle")
+}
+
+model Speciality {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("speciality")
+}
+
+model Career {
+  id            Int      @id @default(autoincrement())
+  name          String   @unique
+  totalCicles   Int      @map("total_cicles")
+  durationYears Int      @map("duration_years")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  subjects Subject[]
+
+  @@map("career")
+}
+
+model Subject {
+  id             Int      @id @default(autoincrement())
+  name           String
+  careerId       Int      @map("career_id")
+  cicleNumber    Int      @map("cicle_number")
+  cycleId        Int?     @map("cycle_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  totalSpots     Int      @default(30)
+  availableSpots Int      @default(30)
+
+  career Career @relation(fields: [careerId], references: [id])
+  cycle  Cycle? @relation(fields: [cycleId], references: [id])
+
+  @@unique([careerId, cicleNumber, name])
+  @@index([careerId, cicleNumber])
+  @@index([cycleId])
+  @@map("subject")
+}

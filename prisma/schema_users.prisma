@@ -1,0 +1,43 @@
+// schema-users.prisma - Base de datos de USUARIOS Y AUTENTICACIÓN
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/client-users"
+}
+
+datasource db_users {
+  provider = "postgresql"
+}
+
+enum RoleType {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+model Role {
+  id    Int       @id @default(autoincrement())
+  name  RoleType  @unique
+  users User[]
+
+  @@map("role")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  password   String
+  phone      String?
+  age        Int?
+  status     String   @default("active")
+  roleId     Int      @default(3) @map("role_id")
+  
+  role       Role     @relation(fields: [roleId], references: [id])
+  
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([roleId])
+  @@index([email])
+  @@map("user")
+}
