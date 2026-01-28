@@ -1,7 +1,15 @@
 import 'dotenv/config';
 import { PrismaClient as PrismaAcademicClient } from '@prisma/client-academic';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
-const prismaAcademic = new PrismaAcademicClient();
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL_ACADEMIC,
+});
+
+const adapter = new PrismaPg(pool);
+
+const prismaAcademic = new PrismaAcademicClient({ adapter });
 
 async function main() {
     console.log('Iniciando seed de la base de datos ACADEMIC...\n');
